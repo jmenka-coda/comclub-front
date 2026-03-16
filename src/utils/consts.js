@@ -1,0 +1,8 @@
+export const ADMIN_ROUTE = '/'
+export const LOGIN_ROUTE = '/login'
+export const REGISTRATION_ROUTE = '/registration'
+export const COMPUTER_ROUTE = '/computer'
+export const PACKAGESERVICE_ROUTE = '/packages'
+export const RENTALS_ROUTE = '/rentals'
+export const RESERVATION_ROUTE = '/reservation'
+export const VISITOR_ROUTE = '/visitor'
