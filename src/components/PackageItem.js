@@ -3,9 +3,32 @@ import Card from 'react-bootstrap/Card';
 import ButtonCardBar from './ButtonCardBar';
 import { Context } from '..';
 import { observer } from 'mobx-react-lite';
+import { deletePackage } from '../http/rentalAPI';
+import toast from 'react-hot-toast';
 
 const PackageItem = observer(({ packageService }) => {
     const { rental } = useContext(Context)
+    const [isDeleting, setIsDeleting] = React.useState(false)
+
+    const handleDelete = async () => {
+        try {
+            setIsDeleting(true)
+            await deletePackage(packageService.id)
+
+            const updatedPkg = rental.package.filter(p => p.id !== packageService.id)
+            rental.setPackages(updatedPkg)
+            
+            if (isSelectedCard) {
+                rental.setSelectedPackage(null)
+            }
+            toast.success('Пакет успешно удален!')
+        } catch (error) {           
+            console.error('Ошибка удаления пакета:', error)
+            toast.error('Этот пакет связан с сессиями')
+        } finally {
+            setIsDeleting(false)
+        }
+    }
 
     const isSelectedCard = packageService.id === rental.selectedPackage?.id
 
@@ -27,10 +50,12 @@ const PackageItem = observer(({ packageService }) => {
                     <Card.Text>Стоимость: {packageService.price} руб</Card.Text>
                 </div>
                 <ButtonCardBar
+                    onClickDelete={handleDelete}
                     isSelectedCard={isSelectedCard}
                     onClickSelect={() => {
                         isSelectedCard ? rental.setSelectedPackage(null) : rental.setSelectedPackage(packageService)
                     }}
+                    isDeleting={isDeleting}
                 />
             </Card.Body>
         </Card>

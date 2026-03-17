@@ -26,6 +26,7 @@ const ComputerItem = observer(({ computer, specification }) => {
             if (isSelectedCard) {
                 rental.setSelectedComputer(null)
             }
+            toast.success('Компьютер успешно удален!')
         } catch (error) {           
             console.error('Ошибка удаления компьютера:', error)
             toast.error('Этот компьютер связан с сессиями')
@@ -60,7 +61,6 @@ const ComputerItem = observer(({ computer, specification }) => {
                 <Card.Header as="h4">
                     Номер компьютера: №{computer.id}
                 </Card.Header>
-
                 <Card.Body>
                     <Row>
                         <Col md={8}>

@@ -9,7 +9,7 @@ const RentalList = ({ rentals }) => {
     return (
         <Row className="d-flex">
             {rentals.map(rental => 
-                <RentalItem key={rental.id} rental={rental}/>
+                <RentalItem key={rental.id} rtl={rental}/>
             )}
         </Row>
     );

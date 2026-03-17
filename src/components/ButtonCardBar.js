@@ -15,8 +15,8 @@ const ConfirmDeleteModal = ({ show, onHide, onConfirm, isDeleting }) => (
             <Modal.Title>Подтверждение удаления</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-            <p>Вы уверены, что хотите удалить этот компьютер?</p>
-            <p className="text-muted small">Это действие нельзя отменить.</p>
+            <p>Вы уверены, что хотите удалить этот объект?</p>
+            <p className="text-muted small">Это действие нельзя будет отменить.</p>
         </Modal.Body>
         <Modal.Footer>
             <Button variant="secondary" onClick={onHide} disabled={isDeleting}>

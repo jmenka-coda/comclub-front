@@ -23,6 +23,11 @@ export const fetchVisitors = async () => {
     const {data} = await $authHost.get('visitor')
     return data
 }
+export const deleteVisitor = async (id) => {
+    const {data} = await $authHost.delete(`visitor/${id}`)
+    return data
+}
+
 
 
 export const createPackage = async (pkg) => {
@@ -32,6 +37,10 @@ export const createPackage = async (pkg) => {
 
 export const fetchPackages = async () => {
     const {data} = await $authHost.get('package-service')
+    return data
+}
+export const deletePackage = async (id) => {
+    const {data} = await $authHost.delete(`package-service/${id}`)
     return data
 }
 

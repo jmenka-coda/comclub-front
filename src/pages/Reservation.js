@@ -11,6 +11,7 @@ import Spinner from 'react-bootstrap/esm/Spinner';
 import { useForm, Controller } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom';
 import { RENTALS_ROUTE } from '../utils/consts';
+import toast from 'react-hot-toast';
 
 const Reservation = observer(() => {
     const { user } = useContext(Context)
@@ -48,7 +49,7 @@ const Reservation = observer(() => {
             navigate(RENTALS_ROUTE)
         })
 
-        console.log(res)
+        toast.success('Сессия создана!')
     }
 
 
