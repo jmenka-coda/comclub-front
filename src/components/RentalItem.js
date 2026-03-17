@@ -5,6 +5,7 @@ import Col from 'react-bootstrap/esm/Col';
 import ButtonCardBar from './ButtonCardBar';
 import { observer } from 'mobx-react-lite';
 import { Context } from '..';
+import { deleteRental } from '../http/rentalAPI';
 
 const RentalItem = observer(({ rental }) => {
     const {user} = useContext(Context)
@@ -22,7 +23,9 @@ const RentalItem = observer(({ rental }) => {
                         <Card.Text>Статус: {rental.status}</Card.Text>
                         <Card.Text>Полная стоимость: {rental.totalCost} руб</Card.Text>
                     </div>
-                    <ButtonCardBar/>
+                    <ButtonCardBar
+                        onClickDelete={() => deleteRental(rental.id)}
+                    />
                 </Card.Body>
             </Card>
         </Col>

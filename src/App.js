@@ -6,6 +6,7 @@ import { observer } from 'mobx-react-lite';
 import { Context } from './index';
 import { check } from './http/userAPI';
 import Spinner from 'react-bootstrap/esm/Spinner';
+import { Toaster } from 'react-hot-toast';
 
 const App = observer(() => {
   const { user } = useContext(Context)
@@ -36,6 +37,7 @@ const App = observer(() => {
 
   return (
     <BrowserRouter>
+      <Toaster position="top-center" reverseOrder={false} />
       <NavBar />
       <AppRouter />
     </BrowserRouter>
