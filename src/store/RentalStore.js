@@ -6,6 +6,7 @@ export default class RentalStore {
         this._packages = []
         this._computers = []
         this._rentals = []
+        this._specifications = []
 
         this._selectedVisitor = {}
         this._selectedPackage = {}
@@ -27,6 +28,9 @@ export default class RentalStore {
     }
     setRentals(rentals) {
         this._rentals = rentals
+    }
+    setSpecification(spc) {
+        this._specifications = spc
     }
     
     setSelectedVisitor(visitor) {
@@ -57,6 +61,9 @@ export default class RentalStore {
     }
     get rentals() {
         return this._rentals
+    }
+    get specifications() {
+        return this._specifications
     }
 
     get selectedVisitor() {

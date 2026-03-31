@@ -58,3 +58,12 @@ export const deleteRental = async (id) => {
     return data
 }
 
+
+export const createSpecification = async (specification) => {
+    const {data} = await $authHost.post('specifications', specification)
+    return data
+}
+export const fetchSpecifications = async () => {
+    const {data} = await $authHost.get('specifications')
+    return data
+}
