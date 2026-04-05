@@ -34,7 +34,7 @@ const CreateModal = ({ show, handleClose, children, onSave }) => {
                 console.log("onSave completed successfully");
                 // Закрываем модалку только после успешного сохранения
                 handleClose();
-            } catch (error) {
+            } catch (error) {                
                 console.error("Error in onSave:", error);
             } finally {
                 setIsSaving(false);

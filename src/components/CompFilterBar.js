@@ -40,8 +40,6 @@ const CompFilterBar = observer(({ computers }) => {
     }, [])
 
     const onSave = async () => {
-        console.log(formData)
-
         let specifId = formData.specificationId
 
         if (newScf) {
@@ -184,7 +182,7 @@ const CompFilterBar = observer(({ computers }) => {
                         variant="success"
                         onClick={() => setShow(true)}
                     >
-                        Создать
+                        Создать компьютер
                     </Button>
                 }
             />

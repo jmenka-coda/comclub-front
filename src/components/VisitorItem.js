@@ -46,7 +46,7 @@ const VisitorItem = observer(({ visitor }) => {
         >            
             <Card.Header as="h3">{visitor.fullName}</Card.Header>
             <Card.Body>
-                <Card.Title>Номер телефона: +{visitor.phone}</Card.Title>
+                <Card.Title>Номер телефона: {visitor.phone}</Card.Title>
                 <Card.Text> Дата рождения: {new Date(visitor.dateOfBirth).toLocaleDateString()} </Card.Text>
                 <Card.Text> Дата регистрации: {new Date(visitor.createdAt).toLocaleDateString()} </Card.Text>
                 <ButtonCardBar
