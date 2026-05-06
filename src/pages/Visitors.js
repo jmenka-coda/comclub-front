@@ -10,18 +10,20 @@ import Spinner from 'react-bootstrap/Spinner';
 const Visitors = observer(() => {
     const {rental} = useContext(Context)
     const [loading, setLoading] = useState(true)
+    const [filteredVisitors, setFilteredVisitors] = useState([])
 
     useEffect(() => {
         fetchVisitors()
             .then(data => {
                 rental.setVisitors(data)
+                setFilteredVisitors(data)
                 setLoading(false)
             })
             .catch(error => {
                 console.error('Ошибка загрузки:', error)
                 setLoading(false)
             })
-    }, [])
+    }, [rental])
 
     if (loading) {
         return (
@@ -35,8 +37,8 @@ const Visitors = observer(() => {
 
     return (
         <Container className='mt-3'>
-                <SearchBar />
-                {rental.visitors.map(visitor =>
+                <SearchBar visitors={rental.visitors} onFilteredChange={setFilteredVisitors} />
+                {filteredVisitors.map(visitor =>
                     <VisitorItem key={visitor.id} visitor={visitor} />
                 )}
         </Container>

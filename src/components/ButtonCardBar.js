@@ -38,7 +38,8 @@ const ButtonCardBar = observer(({
     onClickDelete,
     onClickSelect,
     isSelectedCard,
-    isDeleting = false
+    isDeleting = false,
+    onClickChange
 }) => {
     const [modalShow, setModalShow] = React.useState(false);
     const location = useLocation();
@@ -51,13 +52,16 @@ const ButtonCardBar = observer(({
     return (
         <Row className='align-items-center mt-3'>
             <Col>
-                <Button
-                    className='me-3'
-                    variant="warning"
-                    disabled={isDeleting}
-                >
-                    Изменить
-                </Button>
+                {onClickChange && (
+                    <Button
+                        className='me-3'
+                        variant="warning"
+                        disabled={isDeleting}
+                        onClick={onClickChange}
+                    >
+                        Изменить
+                    </Button>
+                )}
 
                 <Button
                     variant="danger"

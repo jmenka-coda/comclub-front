@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, useMemo } from 'react'
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card'
 import Button from 'react-bootstrap/esm/Button';
@@ -12,6 +12,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom';
 import { RENTALS_ROUTE } from '../utils/consts';
 import toast from 'react-hot-toast';
+import { computerStatusLabel } from '../utils/enumLabels';
 
 const Reservation = observer(() => {
     const { user } = useContext(Context)
@@ -41,15 +42,20 @@ const Reservation = observer(() => {
             "startTime": time
         }
 
-        const res = createRental(rentalData).then(dat => {
-            rental.setSelectedComputer(null)
-            rental.setSelectedVisitor(null)
-            rental.setSelectedPackage(null)
-            setStartTime('')
-            navigate(RENTALS_ROUTE)
-        })
-
-        toast.success('Сессия создана!')
+        const res = createRental(rentalData)
+            .then(dat => {
+                rental.setSelectedComputer(null)
+                rental.setSelectedVisitor(null)
+                rental.setSelectedPackage(null)
+                setStartTime('')
+                navigate(RENTALS_ROUTE)
+                toast.success('Сессия создана!')
+            })
+            .catch(error => {
+                console.log('Ошибка:', error)
+                const errorMessage = error.response?.data?.message || error.message || 'Произошла ошибка'
+                toast.error(errorMessage)
+            })
     }
 
 
@@ -72,6 +78,11 @@ const Reservation = observer(() => {
             })
     }, [])
 
+
+    const freeComputers = useMemo(
+        () => rental.computers.filter((c) => c.status === 'free'),
+        [rental.computers],
+    )
 
     if (isLoading) {
         return (
@@ -161,12 +172,14 @@ const Reservation = observer(() => {
                                 <Typeahead
                                     className={`mb-1 ${errors.computer ? 'is-invalid' : ''}`}
                                     id='computer-typehead'
-                                    labelKey={(option) => `#${option.id} ${option.brand} (${option.model}); статус: ${option.status}`}
+                                    labelKey={(option) =>
+                                        `#${option.id} ${option.brand} (${option.model}) — ${computerStatusLabel(option.status)}`
+                                    }
                                     onChange={(selected) => {
                                         field.onChange(selected[0] || null)
                                         rental.setSelectedComputer(selected[0] || null)
                                     }}
-                                    options={rental.computers}
+                                    options={freeComputers}
                                     placeholder='Введите марку компьютера'
                                     selected={field.value ? [field.value] : []}
                                 />

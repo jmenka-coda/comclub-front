@@ -1,18 +1,18 @@
 import { observer } from 'mobx-react-lite';
-import React, { useContext, useState } from 'react';
-import Row from 'react-bootstrap/esm/Row';
+import React, { useContext, useEffect, useState } from 'react';
+import { specTypeLabel, timeDayLabel } from '../utils/enumLabels';
 import Button from 'react-bootstrap/Button';
-import Col from 'react-bootstrap/Col'
-import Form from 'react-bootstrap/Form'
 import FilterBar from './FilterBar';
 import { Context } from '..';
 import CreateModal from './CreateModal';
 import { createPackage } from '../http/rentalAPI';
 import toast from 'react-hot-toast';
+import ModalPackage from './ModalPackage';
 
-const PackFilterBar = observer(({ packages }) => {
+const PackFilterBar = observer(({ packages, onFilteredChange }) => {
     const { rental } = useContext(Context)
     const [show, setShow] = useState(false)
+    const [filtersState, setFiltersState] = useState({})
     const [formData, setFormData] = useState({
         name: "",
         timeMinutes: "",
@@ -34,107 +34,68 @@ const PackFilterBar = observer(({ packages }) => {
         time = parseInt(h) * 60 + parseInt(m)
 
         const pck = await createPackage({ ...formData, timeMinutes: time })
-            .then(data => {
-                toast.success(`Пакет услуг "${formData.name}" успешно создан!`)
+        toast.success(`Пакет услуг "${formData.name}" успешно создан!`)
 
-                rental.setPackages([...rental.packages, formData])
+        rental.setPackages([...rental.packages, pck])
 
-                setFormData({
-                    name: "",
-                    timeMinutes: "",
-                    typeSpecifComp: "",
-                    timeDay: "",
-                    price: 0
-                })                
-            })
+        setFormData({
+            name: "",
+            timeMinutes: "",
+            typeSpecifComp: "",
+            timeDay: "",
+            price: 0
+        })
     }
 
-    return (<>
-        <CreateModal
-            show={show}
-            handleClose={() => setShow(false)}
-            onSave={onSave}
-            children={
-                <>
-                    <Form.Label>Название</Form.Label>
-                    <Form.Control
-                        className='mb-3'
-                        required
-                        type="text"
-                        placeholder="name"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    />
-                    <Form.Label>Время</Form.Label>
-                    <Form.Control
-                        className='mb-3'
-                        required
-                        type="time"
-                        placeholder="Время"
-                        value={formData.timeMinutes}
-                        onChange={(e) => setFormData({ ...formData, timeMinutes: e.target.value })}
-                    />
-                    <Form.Label>Тип компьютера</Form.Label>
-                    <Form.Select
-                        className='mb-3'
-                        required
-                        type="text"
-                        placeholder="Бренд"
-                        value={formData.typeSpecifComp}
-                        onChange={(e) => setFormData({ ...formData, typeSpecifComp: e.target.value })}
-                    >
-                        <option value=""> Выберите тип </option>
-                        <option value="weak">Слабый</option>
-                        <option value="average">Средний</option>
-                        <option value="powerful">Мощный</option>
-                    </Form.Select>
-                    <Form.Label>Время суток</Form.Label>
-                    <Form.Select
-                        className='mb-3'
-                        required
-                        type="text"
-                        placeholder="Бренд"
-                        value={formData.timeDay}
-                        onChange={(e) => setFormData({ ...formData, timeDay: e.target.value })}
-                    >
-                        <option value=""> Выберите время суток </option>
-                        <option value="morning">Утренний</option>
-                        <option value="afternoon">Обеденный</option>
-                        <option value="evening">Вечерний</option>
-                        <option value="night">Ночной</option>
-                    </Form.Select>
-                    <Form.Label>Стоимость</Form.Label>
-                    <Form.Control
-                        className='mb-3'
-                        required
-                        type="number"
-                        min={0}
-                        step={0.01}
-                        placeholder="Стоимость"
-                        value={formData.price}
-                        onChange={(e) => {
-                            setFormData({ ...formData, price: parseFloat(parseFloat(e.target.value).toFixed(2)) });
-                        }}
-                    />
-                    <Form.Control.Feedback type="invalid"> Заполните все поля! </Form.Control.Feedback>
-                </>
-            }
-        />
+    useEffect(() => {
+        if (!onFilteredChange) return
+        const filteredPackages = packages.filter((pkg) => {
+            return Object.entries(filtersState).every(([key, value]) => {
+                if (!value) return true
+                return String(pkg[key]) === String(value)
+            })
+        })
+        onFilteredChange(filteredPackages)
+    }, [packages, filtersState, onFilteredChange])
 
-        <FilterBar
-            objects={packages}
-            filters={filters}
-            btn={
-                <Button
-                    className='me-2'
-                    variant='success'
-                    onClick={() => setShow(true)}
-                >
-                    Создать пакет услуг
-                </Button>
-            }
-        />
-    </>
+    const formatFilterOption = (key, value) => {
+        if (key === 'timeDay') return timeDayLabel(value)
+        if (key === 'typeSpecifComp') return specTypeLabel(value)
+        return value
+    }
+
+    return (
+        <>
+            <CreateModal
+                title={'Создание пакета услуг'}
+                show={show}
+                handleClose={() => setShow(false)}
+                onSave={onSave}
+                children={
+                    <ModalPackage
+                        formData={formData}
+                        setFormData={setFormData}
+                    />
+                }
+            />
+
+            <FilterBar
+                objects={packages}
+                filters={filters}
+                onFilterChange={(key, value) => setFiltersState((prev) => ({ ...prev, [key]: value }))}
+                currentFilters={filtersState}
+                formatFilterOption={formatFilterOption}
+                btnCreate={
+                    <Button
+                        className='me-2'
+                        variant='success'
+                        onClick={() => setShow(true)}
+                    >
+                        Создать пакет услуг
+                    </Button>
+                }
+            />
+        </>
     );
 });
 

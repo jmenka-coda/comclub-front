@@ -1,33 +1,51 @@
 import { observer } from 'mobx-react-lite';
-import React from 'react';
-import Row from 'react-bootstrap/esm/Row';
-import Button from 'react-bootstrap/Button';
-import Col from 'react-bootstrap/Col'
-import Dropdown from 'react-bootstrap/Dropdown';
-import DropdownButton from 'react-bootstrap/DropdownButton';
-import Form from 'react-bootstrap/Form';
+import React, { useEffect, useMemo, useState } from 'react';
 import FilterBar from './FilterBar';
+import { rentalStatusLabel } from '../utils/enumLabels';
 
-const RentFilterBar = observer(({ rentals }) => {
-    
-    rentals = rentals.map(rental => ({
-        ...rental,
-        admin: rental.admin.fullName,
-        package: rental.package.name,
-        compModel: rental.computer.model
-    }))
+const RentFilterBar = observer(({ rentals, onFilteredChange }) => {
+    const [filtersState, setFiltersState] = useState({})
+
+    const rows = useMemo(
+        () =>
+            (rentals || []).map((rental) => ({
+                ...rental,
+                admin: rental.admin?.fullName,
+                package: rental.package?.name,
+                compModel: rental.computer?.model,
+            })),
+        [rentals],
+    )
 
     const filters = [
         { key: 'admin', label: 'Администратор' },
         { key: 'package', label: 'Пакет услуг' },
         { key: 'compModel', label: 'Компьютер' },
-        { key: 'status', label: 'Статус' }
-    ];
+        { key: 'status', label: 'Статус' },
+    ]
+
+    const formatFilterOption = (key, value) => {
+        if (key === 'status') return rentalStatusLabel(value)
+        return value
+    }
+
+    useEffect(() => {
+        if (!onFilteredChange) return
+        const filteredRentals = rows.filter((rental) =>
+            Object.entries(filtersState).every(([key, value]) => !value || String(rental[key]) === String(value)),
+        )
+        onFilteredChange(filteredRentals)
+    }, [rows, filtersState, onFilteredChange])
 
     return (
-        <FilterBar objects={rentals} filters={filters} />
-    );
-    
+        <FilterBar
+            objects={rows}
+            filters={filters}
+            onFilterChange={(key, value) => setFiltersState((prev) => ({ ...prev, [key]: value }))}
+            currentFilters={filtersState}
+            formatFilterOption={formatFilterOption}
+        />
+    )
 });
 
 export default RentFilterBar;

@@ -12,18 +12,20 @@ import Col from 'react-bootstrap/esm/Col';
 const Rentals = observer(() => {
     const { rental } = useContext(Context)
     const [loading, setLoading] = useState(true)
+    const [filteredRentals, setFilteredRentals] = useState([])
 
     useEffect(() => {
         fetchRentals()
             .then(data => {
                 rental.setRentals(data)
+                setFilteredRentals(data)
                 setLoading(false)
             })
             .catch(error => {
                 console.error('Ошибка загрузки:', error)
                 setLoading(false)
             })
-    }, [])
+    }, [rental])
 
     if (loading) {
         return (
@@ -39,10 +41,10 @@ const Rentals = observer(() => {
         <Container className='mt-3'>
             <Row>
                 <Col xs={3}>
-                    <RentFilterBar rentals={rental.rentals} />
+                    <RentFilterBar rentals={rental.rentals} onFilteredChange={setFilteredRentals} />
                 </Col>
                 <Col>
-                    <RentalList rentals={rental.rentals}></RentalList>
+                    <RentalList rentals={filteredRentals}></RentalList>
                 </Col>
             </Row>
         </Container>

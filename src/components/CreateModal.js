@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 
-const CreateModal = ({ show, handleClose, children, onSave }) => {
+const CreateModal = ({ title, show, handleClose, children, onSave }) => {
     const [validated, setValidated] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
 
@@ -38,6 +38,7 @@ const CreateModal = ({ show, handleClose, children, onSave }) => {
                 console.error("Error in onSave:", error);
             } finally {
                 setIsSaving(false);
+                setValidated(false)
             }
         }
     }
@@ -49,7 +50,7 @@ const CreateModal = ({ show, handleClose, children, onSave }) => {
             backdrop="static"
         >
             <Modal.Header closeButton>
-                <Modal.Title>Создание</Modal.Title>
+                <Modal.Title>{title}</Modal.Title>
             </Modal.Header>
 
             <Form

@@ -1,10 +1,16 @@
 import { $authHost, $host } from "./index";
 import { jwtDecode } from "jwt-decode"
 
-export const registration = async (fullName, dateOfBirth, experience, hiringDate, password) => {
-    const {data} = await $host.post('auth/registration', {fullName, dateOfBirth, experience, hiringDate, password})
-    localStorage.setItem('token', data.token)
-    return jwtDecode(data.token)
+/** Создание администратора главным (JWT текущего пользователя; ответ без нового токена). */
+export const registerAdministratorByChief = async (fullName, dateOfBirth, experience, hiringDate, password) => {
+    const { data } = await $authHost.post('auth/registration', {
+        fullName,
+        dateOfBirth,
+        experience,
+        hiringDate,
+        password,
+    })
+    return data
 }
 
 export const login = async (login, password) => {

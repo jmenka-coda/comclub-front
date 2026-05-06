@@ -1,4 +1,4 @@
-import React, { use, useContext } from 'react'
+import React, { useContext } from 'react'
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Col from 'react-bootstrap/esm/Col';
@@ -7,6 +7,7 @@ import { observer } from 'mobx-react-lite';
 import { Context } from '..';
 import { deleteRental } from '../http/rentalAPI';
 import toast from 'react-hot-toast';
+import { rentalStatusLabel } from '../utils/enumLabels';
 
 const RentalItem = observer(({ rtl }) => {
     const { rental } = useContext(Context)
@@ -39,7 +40,7 @@ const RentalItem = observer(({ rtl }) => {
                         <Card.Text><strong>Пакет услуг:</strong> {rtl.package.name}</Card.Text>
                         <Card.Text><strong>Клиент: </strong>{rtl.visitor.fullName}</Card.Text>
                         <Card.Text><strong>Компьютер: </strong>{rtl.computer.brand} ({rtl.computer.model})</Card.Text>
-                        <Card.Text><strong>Статус: </strong>{rtl.status}</Card.Text>
+                        <Card.Text><strong>Статус: </strong>{rentalStatusLabel(rtl.status)}</Card.Text>
                         <Card.Text><strong>Полная стоимость:</strong> {rtl.totalCost} руб</Card.Text>
                         <Card.Text><strong>Время начала:</strong> {new Date( rtl.startTime).toLocaleTimeString()}</Card.Text>
                     </div>

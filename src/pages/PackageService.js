@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import React, { useContext, useEffect, useState } from 'react'
 import { Context } from '..';
-import { fetchComputers, fetchPackages } from '../http/rentalAPI';
+import { fetchPackages } from '../http/rentalAPI';
 import Container from 'react-bootstrap/esm/Container';
 import Spinner from 'react-bootstrap/Spinner';
 import PackageItem from '../components/PackageItem';
@@ -13,18 +13,20 @@ import Col from 'react-bootstrap/esm/Col';
 const PackageService = observer(() => {
     const { rental } = useContext(Context)
     const [loading, setLoading] = useState(true)
+    const [filteredPackages, setFilteredPackages] = useState([])
 
     useEffect(() => {
         fetchPackages()
             .then(data => {
                 rental.setPackages(data)
+                setFilteredPackages(data)
                 setLoading(false)
             })
             .catch(error => {
                 console.error('Ошибка загрузки:', error)
                 setLoading(false)
             })
-    }, [])
+    }, [rental])
 
     if (loading) {
         return (
@@ -40,10 +42,10 @@ const PackageService = observer(() => {
         <Container className='mt-3'>
             <Row>
                 <Col xs={3}>
-                    <PackFilterBar packages={rental.packages} />
+                    <PackFilterBar packages={rental.packages} onFilteredChange={setFilteredPackages} />
                 </Col>
                 <Col>
-                    {rental.packages.map(packageService =>
+                    {filteredPackages.map(packageService =>
                         <PackageItem key={packageService.id} packageService={packageService} />
                     )}
                 </Col>

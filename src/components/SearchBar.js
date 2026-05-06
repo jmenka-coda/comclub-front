@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
@@ -11,29 +11,50 @@ import PhoneInput from 'react-phone-number-input'
 import toast from 'react-hot-toast';
 import { createVisitor } from '../http/rentalAPI';
 
-const SearchBar = observer(() => {
+const SearchBar = observer(({ visitors, onFilteredChange }) => {
     const { rental } = useContext(Context)
     const [show, setShow] = useState(false)
+    const [searchName, setSearchName] = useState('')
     const [formData, setFormData] = useState({
         fullName: "",
         dateOfBirth: "",
         phone: ""
     })
 
+    useEffect(() => {
+        const searchTerm = searchName.toLowerCase().trim();
+        
+        if (!searchTerm) {
+            onFilteredChange(visitors);
+        } else {
+            const filtered = visitors.filter(v =>
+                v.fullName.toLowerCase().includes(searchTerm)
+            );
+            onFilteredChange(filtered);
+        }
+    }, [searchName, visitors, onFilteredChange]);
+
     const onSave = async () => {
-
-        const visitor = await createVisitor(formData)
-            .then(data => {
-                toast.success(`Клиент ${formData.fullName} успешно добвален!`)
-
-                rental.setVisitors([...rental.visitors, formData])
-
-                setFormData({
-                    fullName: "",
-                    dateOfBirth: "",
-                    phone: ""
-                })
-            })
+        try {
+            const newVisitor = await createVisitor(formData);
+            toast.success(`Клиент ${formData.fullName} успешно добавлен!`);
+            
+            const updatedVisitors = [...visitors, newVisitor];
+            rental.setVisitors(updatedVisitors);
+            onFilteredChange(updatedVisitors)
+            
+            setFormData({
+                fullName: "",
+                dateOfBirth: "",
+                phone: ""
+            });
+            
+            setShow(false);
+            setSearchName(''); // Сбрасываем поиск
+        } catch (error) {
+            toast.error('Ошибка при добавлении клиента');
+            console.error(error);
+        }
     }
 
     return (
@@ -42,54 +63,52 @@ const SearchBar = observer(() => {
                 show={show}
                 handleClose={() => setShow(false)}
                 onSave={onSave}
-                children={
-                    <>
-                        <Form.Label>ФИО</Form.Label>
-                        <Form.Control
-                            className='mb-3'
-                            required
-                            type="text"
-                            placeholder="ФИО"
-                            value={formData.fullName}
-                            onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                        />
-                        <Form.Label>Дата рождения</Form.Label>
-                        <Form.Control
-                            className='mb-3'
-                            required
-                            type="date"
-                            placeholder="Дата рождения"
-                            value={formData.dateOfBirth}
-                            onChange={(e) => {
-                                console.log(e.target.value)
-                                setFormData({ ...formData, dateOfBirth: e.target.value })
-                            }}
-                        />
-                        <Form.Label>Номер телефона</Form.Label>
-                        <div style={{ maxWidth: 30 }}>
-                            <PhoneInput
-                                international
-                                defaultCountry='BY'
-                                className='mb-3'
-                                required
-                                value={formData.phone}
-                                onChange={(phoneValue) => setFormData({ ...formData, phone: phoneValue || '' })}
-                            />
-                        </div>
-                        <Form.Control.Feedback type="invalid"> Заполните все поля! </Form.Control.Feedback>
-                    </>
-                }
-            />
+            >
+                <Form.Label>ФИО</Form.Label>
+                <Form.Control
+                    className='mb-3'
+                    required
+                    type="text"
+                    placeholder="ФИО"
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                />
+                
+                <Form.Label>Дата рождения</Form.Label>
+                <Form.Control
+                    className='mb-3'
+                    required
+                    type="date"
+                    placeholder="Дата рождения"
+                    value={formData.dateOfBirth}
+                    onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                />
+                
+                <Form.Label>Номер телефона</Form.Label>
+                <div style={{ maxWidth: '300px' }}>
+                    <PhoneInput
+                        international
+                        defaultCountry='BY'
+                        className='mb-3'
+                        required
+                        value={formData.phone}
+                        onChange={(phoneValue) => setFormData({ ...formData, phone: phoneValue || '' })}
+                    />
+                </div>
+            </CreateModal>
 
             <Row className="mb-3 align-items-center g-2">
                 <Col>
                     <InputGroup>
                         <Form.Control
-                            placeholder="Введите имя"
-                            aria-label="Recipient's username"
+                            placeholder="Поиск по имени"
+                            value={searchName}
+                            onChange={e => {
+                                setSearchName(e.target.value);
+                            }}
                         />
                         <Button variant="outline-secondary">
-                            Найти
+                            Найти ({visitors.length})
                         </Button>
                     </InputGroup>
                 </Col>
